@@ -1,10 +1,10 @@
-package net.partala.user_service;
+package net.partala.user;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class UserServiceApplicationTests {
+class UserApplicationTests {
 
 	@Test
 	void contextLoads() {

@@ -1,4 +1,4 @@
-package net.partala.user_service;
+package net.partala.user;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
