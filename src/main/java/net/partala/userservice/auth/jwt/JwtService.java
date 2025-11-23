@@ -5,12 +5,10 @@ import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import lombok.Getter;
-import lombok.Setter;
 import net.partala.userservice.auth.SecurityUser;
+import net.partala.userservice.config.JwtProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -21,30 +19,30 @@ import java.util.Base64;
 import java.util.Date;
 
 @Service
-@ConfigurationProperties(prefix = "app.jwt")
 public class JwtService {
 
     private final Logger log = LoggerFactory.getLogger(JwtService.class);
-    @Setter
-    private String secret;
-    @Setter
-    @Getter
-    private long expirationMinutes;
+    private final JwtProperties properties;
 
+    public JwtService(JwtProperties properties) {
+        this.properties = properties;
+    }
 
     private Key getSigningKey() {
-        byte[] keyBytes = Base64.getDecoder().decode(secret);
+        byte[] keyBytes = Base64.getDecoder().decode(properties.secret());
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
     public String generateToken(UserDetails userDetails, TokenPurpose tokenPurpose) {
         Instant now = Instant.now();
-        Instant expire = now.plus(Duration.ofMinutes(expirationMinutes));
+        log.info("{}", properties.expirationMinutes());
+        Instant expire = now.plus(Duration.ofMinutes(properties.expirationMinutes()));
 
         SecurityUser user = (SecurityUser) userDetails;
         return Jwts.builder()
                 .claim("userId", user.getId())
                 .claim("purpose", tokenPurpose.name())
+                .claim("roles", user.getRoles())
                 .setSubject(user.getUsername())
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(expire))
@@ -91,5 +89,9 @@ public class JwtService {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+
+    public long getExpirationMinutes() {
+        return properties.expirationMinutes();
     }
 }

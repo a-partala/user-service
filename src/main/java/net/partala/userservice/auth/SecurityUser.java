@@ -16,6 +16,7 @@ public class SecurityUser implements UserDetails {
     private final Long id;
     private final String username;
     private final String password;
+    @Getter
     private final Set<UserRole> roles;
     private final boolean active = true;
 
