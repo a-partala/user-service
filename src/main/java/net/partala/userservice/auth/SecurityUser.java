@@ -1,12 +1,14 @@
 package net.partala.userservice.auth;
 
 import lombok.Getter;
+import net.partala.userservice.user.UserRole;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public class SecurityUser implements UserDetails {
 
@@ -14,10 +16,10 @@ public class SecurityUser implements UserDetails {
     private final Long id;
     private final String username;
     private final String password;
-    private final List<String> roles;
+    private final Set<UserRole> roles;
     private final boolean active = true;
 
-    public SecurityUser(Long id, String username, String password, List<String> roles) {
+    public SecurityUser(Long id, String username, String password, Set<UserRole> roles) {
         this.id = id;
         this.username = username;
         this.password = password;
@@ -27,7 +29,7 @@ public class SecurityUser implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
-                .map(r -> new SimpleGrantedAuthority("ROLE_" + r))
+                .map(r -> new SimpleGrantedAuthority(r.getAuthority()))
                 .toList();
     }
 
