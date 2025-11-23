@@ -17,7 +17,11 @@ net.partala.user
 ├── auth/
 │   └── jwt/
 ├── config/
-└── dto/
+├── dto/
+│   ├── request/
+│   └── response/
+├── exception/
+└── user/
 ```
 
 ## API endpoints
