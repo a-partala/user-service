@@ -1,6 +1,6 @@
 
 # User Service
-REST API for user management and authentication
+REST microsrvice for user management and authentication
 
 ## Technologies
 Java 21, Spring Boot (Web, Security, Data JPA), PostgreSQL, Docker, JUnit, Mockito, Maven, Lombok
@@ -26,7 +26,6 @@ net.partala.user
 
 ## API endpoints
 ```
-
 POST /auth/register                 - create new user
 POST /auth/login                    - authenticate and get JWT
 POST /auth/email-verification-token - temporary, generate verification token
@@ -34,7 +33,17 @@ POST /auth/verify-email?token=TOKEN - verify email with token
 GET /users/{id}                     - get user by id
 POST /users/{id}/promote            - promote user to ADMIN
 ```
+
+## Run locally
+Prerequisite:
+- PostgreSQL running locally
+```
+mvn clean install
+mvn spring-boot:run
+```
+
 ## Request Examples
+```
 	POST /auth/register
 	{
 		"username": "alexey",
@@ -47,3 +56,4 @@ POST /users/{id}/promote            - promote user to ADMIN
 		"username": "alexey",
 		"password": "12345678"
 	}
+```
