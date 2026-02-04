@@ -9,6 +9,7 @@ import net.partala.userservice.auth.SecurityUser;
 import net.partala.userservice.config.JwtProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -55,11 +56,15 @@ public class JwtService {
     }
 
     public TokenPurpose extractPurpose(String token) {
-        return TokenPurpose.valueOf(parseAllClaims(token).get("purpose", String.class));
+        String purposeStr = parseAllClaims(token).get("purpose", String.class);
+        try {
+            return TokenPurpose.valueOf(purposeStr);
+        } catch (IllegalArgumentException | NullPointerException e) {
+            throw new BadCredentialsException("Invalid token format or signature");
+        }
     }
 
     public String extractUsername(String token) {
-
         return parseAllClaims(token).getSubject();
     }
 

@@ -12,7 +12,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/auth")
 public class AuthController {
 
     private final Logger log = LoggerFactory.getLogger(AuthController.class);
@@ -24,7 +23,7 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @PostMapping("/register")
+    @PostMapping("/auth/register")
     public ResponseEntity<Void> register(
             @RequestBody @Valid
             RegistrationRequest registrationRequest
@@ -35,7 +34,7 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PostMapping("/login")
+    @PostMapping("/auth/login")
     public ResponseEntity<JwtResponse> login(
             @RequestBody @Valid
             LoginRequest loginRequest
@@ -47,8 +46,9 @@ public class AuthController {
                 .body(response);
     }
 
+    //todo: segregate email end-points
     //todo: actually send verification
-    @PostMapping("/send-email-verification")
+    @PostMapping("email/request-verification")
     public ResponseEntity<JwtResponse> sendEmailVerification(
             @AuthenticationPrincipal SecurityUser securityUser
     ) {
@@ -59,7 +59,7 @@ public class AuthController {
                 .body(jwtResponse);
     }
 
-    @PostMapping("/verify-email")
+    @PostMapping("email/verify")
     public ResponseEntity<Void> verifyEmail(
             @RequestParam(value = "token", required = true)
             String token

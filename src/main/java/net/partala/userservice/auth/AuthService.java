@@ -73,14 +73,17 @@ public class AuthService {
             String token
     ) {
 
-        TokenPurpose purpose = jwtService.extractPurpose(token);
-        if(purpose != TokenPurpose.EMAIL_VERIFICATION) {
-            throw new AccessDeniedException("Token purpose is not allowed for this operation");
+        try {
+            TokenPurpose purpose = jwtService.extractPurpose(token);
+            if(purpose != TokenPurpose.EMAIL_VERIFICATION) {
+                throw new AccessDeniedException("Invalid token format or signature");
+            }
+            Long userId = jwtService.extractUserId(token);
+            userService.verifyEmail(userId);
+        } catch (Exception e) {
+            throw new AccessDeniedException("Invalid token format or signature");
         }
 
-        Long userId = jwtService.extractUserId(token);
-
-        userService.verifyEmail(userId);
     }
 
 }

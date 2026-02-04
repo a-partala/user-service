@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -21,9 +22,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig{
 
     private final JwtAuthenticationFilter jwtAuthentificationFilter;
+    private final AuthenticationEntryPoint authEntryPoint;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthentificationFilter) {
+    public SecurityConfig(JwtAuthenticationFilter jwtAuthentificationFilter, AuthenticationEntryPoint authEntryPoint) {
         this.jwtAuthentificationFilter = jwtAuthentificationFilter;
+        this.authEntryPoint = authEntryPoint;
     }
 
     @Bean
@@ -33,9 +36,12 @@ public class SecurityConfig{
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/email/request-verification").permitAll()
+                        .requestMatchers("/email/verify").authenticated()
                         .requestMatchers("/admin/**").hasAuthority(UserRole.ADMIN.name())
                         .anyRequest().authenticated()
                 )
+                .exceptionHandling(ex -> ex.authenticationEntryPoint(authEntryPoint))
                 .addFilterBefore(jwtAuthentificationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
