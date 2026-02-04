@@ -29,8 +29,8 @@ net.partala.user
 ```
 POST /auth/register                 - create new user
 POST /auth/login                    - authenticate and get JWT
-POST /auth/email-verification-token - temporary, generate verification token
-POST /auth/verify-email?token=TOKEN - verify email with token
+POST /email/request-verification - temporary, generate verification token
+POST /email/verify?token=TOKEN - verify email with token
 GET /users/{id}                     - get user by id
 POST /users/{id}/promote            - promote user to ADMIN
 ```
