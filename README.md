@@ -1,6 +1,6 @@
 
 # User Service
-REST microsrvice for user management and authentication
+REST microservice for user management and authentication
 
 ## Technologies
 Java 21, Spring Boot (Web, Security, Data JPA), PostgreSQL, Docker, JUnit, Mockito, Maven, Lombok
@@ -48,7 +48,6 @@ mvn spring-boot:run
 	POST /auth/register
 	{
 		"username": "alexey",
-		"email": "alexey@gmail.com",
 		"password": "12345678"
 	}
 	
@@ -57,4 +56,7 @@ mvn spring-boot:run
 		"username": "alexey",
 		"password": "12345678"
 	}
+	
+	POST /email/request-verification
+	"alexey@gmail.com"
 ```

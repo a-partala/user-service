@@ -11,10 +11,8 @@ public class UserMapper {
         return new UserResponse(
                 entity.getId(),
                 entity.getUsername(),
-                entity.getEmail(),
                 entity.getRegistrationDateTime(),
-                entity.getRoles(),
-                entity.isEmailVerified()
+                entity.getRoles()
         );
     }
 }

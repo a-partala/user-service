@@ -12,19 +12,12 @@ public record UserResponse(
         Long id,
 
         @NotNull
-        String login,
-
-        @NotNull
-        @Email
-        String email,
+        String username,
 
         @Null
         LocalDateTime registrationDateTime,
 
         @Null
-        Set<UserRole> roles,
-
-        @Null
-        boolean emailVerified
+        Set<UserRole> roles
 ) {
 }

@@ -50,7 +50,6 @@ public class UserService {
         var userToSave = new UserEntity();
         userToSave.setUsername(registrationRequest.username());
         userToSave.setPassword(passwordEncoder.encode(registrationRequest.password()));
-        userToSave.setEmailVerified(false);
         userToSave.setRegistrationDateTime(LocalDateTime.now());
 
         var role = repository.findAny().isEmpty() ?
@@ -86,7 +85,6 @@ public class UserService {
 
         var userEntity = getUserEntityById(userId);
         userEntity.setEmail(email);
-        userEntity.setEmailVerified(true);
         repository.save(userEntity);
     }
 }
