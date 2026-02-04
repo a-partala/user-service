@@ -15,6 +15,7 @@ Java 21, Spring Boot (Web, Security, Data JPA), PostgreSQL, Docker, JUnit, Mocki
 ```
 net.partala.user
 ├── auth/
+│   ├── email/
 │   └── jwt/
 ├── config/
 ├── dto/

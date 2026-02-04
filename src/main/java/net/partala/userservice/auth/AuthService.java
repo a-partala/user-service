@@ -8,15 +8,15 @@ import net.partala.userservice.dto.request.RegistrationRequest;
 import net.partala.userservice.user.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
 
-@org.springframework.stereotype.Service
+@Service
 public class AuthService {
 
     private final Logger log = LoggerFactory.getLogger(AuthService.class);
@@ -54,36 +54,4 @@ public class AuthService {
                 expiresAt
         );
     }
-
-    public JwtResponse getEmailToken(
-            SecurityUser securityUser
-    ) {
-        log.info("Called getEmailToken");
-
-        var jwt = jwtService.generateToken(securityUser, TokenPurpose.EMAIL_VERIFICATION);
-        var expiresAt = Instant.now().plus(Duration.ofMinutes(jwtService.getExpirationMinutes()));
-        return new JwtResponse(
-                jwt,
-                "Bearer",
-                expiresAt
-        );
-    }
-
-    public void verifyEmail(
-            String token
-    ) {
-
-        try {
-            TokenPurpose purpose = jwtService.extractPurpose(token);
-            if(purpose != TokenPurpose.EMAIL_VERIFICATION) {
-                throw new AccessDeniedException("Invalid token format or signature");
-            }
-            Long userId = jwtService.extractUserId(token);
-            userService.verifyEmail(userId);
-        } catch (Exception e) {
-            throw new AccessDeniedException("Invalid token format or signature");
-        }
-
-    }
-
 }
