@@ -30,11 +30,12 @@ public class EmailService {
     }
 
     public JwtResponse getEmailToken(
-            SecurityUser securityUser
+            SecurityUser securityUser,
+            String email
     ) {
         log.info("Called getEmailToken");
 
-        var jwt = jwtService.generateToken(securityUser, TokenPurpose.EMAIL_VERIFICATION);
+        var jwt = jwtService.generateEmailVerificationToken(securityUser, email);
         var expiresAt = Instant.now().plus(Duration.ofMinutes(jwtService.getExpirationMinutes()));
         return new JwtResponse(
                 jwt,
@@ -52,8 +53,9 @@ public class EmailService {
             if(purpose != TokenPurpose.EMAIL_VERIFICATION) {
                 throw new AccessDeniedException("Invalid token format or signature");
             }
+            String email = jwtService.extractEmail(token);
             Long userId = jwtService.extractUserId(token);
-            userService.verifyEmail(userId);
+            userService.verifyEmail(userId, email);
         } catch (Exception e) {
             throw new AccessDeniedException("Invalid token format or signature");
         }

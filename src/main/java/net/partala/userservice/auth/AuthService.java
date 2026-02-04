@@ -2,7 +2,6 @@ package net.partala.userservice.auth;
 
 import net.partala.userservice.dto.response.JwtResponse;
 import net.partala.userservice.auth.jwt.JwtService;
-import net.partala.userservice.auth.jwt.TokenPurpose;
 import net.partala.userservice.dto.request.LoginRequest;
 import net.partala.userservice.dto.request.RegistrationRequest;
 import net.partala.userservice.user.UserService;
@@ -46,7 +45,7 @@ public class AuthService {
                 loginRequest.password());
         authenticationManager.authenticate(authToken);
         var userDetails = userDetailsService.loadUserByUsername(loginRequest.username());
-        var jwt = jwtService.generateToken(userDetails, TokenPurpose.ACCESS);
+        var jwt = jwtService.generateAccessToken(userDetails);
         var expiresAt = Instant.now().plus(Duration.ofMinutes(jwtService.getExpirationMinutes()));
         return new JwtResponse(
                 jwt,

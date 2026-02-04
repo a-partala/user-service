@@ -36,8 +36,8 @@ public class SecurityConfig{
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/auth/**").permitAll()
-                        .requestMatchers("/email/request-verification").permitAll()
-                        .requestMatchers("/email/verify").authenticated()
+                        .requestMatchers("/email/verify").permitAll()
+                        .requestMatchers("/email/request-verification").authenticated()
                         .requestMatchers("/admin/**").hasAuthority(UserRole.ADMIN.name())
                         .anyRequest().authenticated()
                 )

@@ -1,5 +1,6 @@
 package net.partala.userservice.auth.email;
 
+import jakarta.validation.constraints.Email;
 import net.partala.userservice.auth.SecurityUser;
 import net.partala.userservice.dto.response.JwtResponse;
 import org.slf4j.Logger;
@@ -7,10 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/email")
@@ -29,11 +27,12 @@ public class EmailController {
     //todo: actually send verification
     @PostMapping("request-verification")
     public ResponseEntity<JwtResponse> sendEmailVerification(
+            @RequestBody @Email String email,
             @AuthenticationPrincipal SecurityUser securityUser
     ) {
         log.info("Called sendEmailVerification");
 
-        var jwtResponse = emailService.getEmailToken(securityUser);
+        var jwtResponse = emailService.getEmailToken(securityUser, email);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(jwtResponse);
     }

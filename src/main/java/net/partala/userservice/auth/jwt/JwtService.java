@@ -34,7 +34,7 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(UserDetails userDetails, TokenPurpose tokenPurpose) {
+    public String generateAccessToken(UserDetails userDetails) {
         Instant now = Instant.now();
         log.info("{}", properties.expirationMinutes());
         Instant expire = now.plus(Duration.ofMinutes(properties.expirationMinutes()));
@@ -42,8 +42,25 @@ public class JwtService {
         SecurityUser user = (SecurityUser) userDetails;
         return Jwts.builder()
                 .claim("userId", user.getId())
-                .claim("purpose", tokenPurpose.name())
+                .claim("purpose", TokenPurpose.ACCESS)
                 .claim("roles", user.getRoles())
+                .setSubject(user.getUsername())
+                .setIssuedAt(Date.from(now))
+                .setExpiration(Date.from(expire))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public String generateEmailVerificationToken(UserDetails userDetails, String email) {
+        Instant now = Instant.now();
+        log.info("{}", properties.expirationMinutes());
+        Instant expire = now.plus(Duration.ofMinutes(properties.expirationMinutes()));
+
+        SecurityUser user = (SecurityUser) userDetails;
+        return Jwts.builder()
+                .claim("userId", user.getId())
+                .claim("email", email)
+                .claim("purpose", TokenPurpose.EMAIL_VERIFICATION)
                 .setSubject(user.getUsername())
                 .setIssuedAt(Date.from(now))
                 .setExpiration(Date.from(expire))
@@ -59,6 +76,14 @@ public class JwtService {
         String purposeStr = parseAllClaims(token).get("purpose", String.class);
         try {
             return TokenPurpose.valueOf(purposeStr);
+        } catch (IllegalArgumentException | NullPointerException e) {
+            throw new BadCredentialsException("Invalid token format or signature");
+        }
+    }
+
+    public String extractEmail(String token) {
+        try {
+            return parseAllClaims(token).get("email", String.class);
         } catch (IllegalArgumentException | NullPointerException e) {
             throw new BadCredentialsException("Invalid token format or signature");
         }

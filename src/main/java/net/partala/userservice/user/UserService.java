@@ -49,7 +49,6 @@ public class UserService {
     ) {
         var userToSave = new UserEntity();
         userToSave.setUsername(registrationRequest.username());
-        userToSave.setEmail(registrationRequest.email());
         userToSave.setPassword(passwordEncoder.encode(registrationRequest.password()));
         userToSave.setEmailVerified(false);
         userToSave.setRegistrationDateTime(LocalDateTime.now());
@@ -83,9 +82,10 @@ public class UserService {
         return mapper.toResponse(savedUser);
     }
 
-    public void verifyEmail(Long userId) {
+    public void verifyEmail(Long userId, String email) {
 
         var userEntity = getUserEntityById(userId);
+        userEntity.setEmail(email);
         userEntity.setEmailVerified(true);
         repository.save(userEntity);
     }
