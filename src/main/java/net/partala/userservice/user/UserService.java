@@ -5,10 +5,8 @@ import net.partala.userservice.dto.response.UserResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -19,24 +17,20 @@ public class UserService {
     private final Logger log = LoggerFactory.getLogger(UserService.class);
     private final UserRepository repository;
     private final UserMapper mapper;
-    private final PasswordEncoder passwordEncoder;
 
     public UserService(
             UserRepository repository,
-            UserMapper mapper,
-            PasswordEncoder passwordEncoder
+            UserMapper mapper
     ) {
         this.repository = repository;
         this.mapper = mapper;
-        this.passwordEncoder = passwordEncoder;
     }
 
     public UserResponse getUserById(Long id) {
         return mapper.toResponse(getUserEntityById(id));
     }
 
-    //For service-layer use only
-    public UserEntity getUserEntityById(Long id) {
+    private UserEntity getUserEntityById(Long id) {
 
         return repository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException(
@@ -44,18 +38,22 @@ public class UserService {
                 ));
     }
 
+    @Transactional
     public void createUser(
             RegistrationRequest registrationRequest
     ) {
-        var userToSave = new UserEntity();
-        userToSave.setUsername(registrationRequest.username());
-        userToSave.setPassword(passwordEncoder.encode(registrationRequest.password()));
-        userToSave.setRegistrationDateTime(LocalDateTime.now());
 
-        var role = repository.findAny().isEmpty() ?
-                UserRole.ADMIN :
-                UserRole.USER;
-        userToSave.setRoles(new HashSet<>(Set.of(role)));
+        Set<UserRole> roles = new HashSet<>();
+        roles.add(UserRole.USER);
+        if(!repository.existsBy()) {
+            roles.add(UserRole.ADMIN);
+        }
+
+        var userToSave = UserEntity.builder()
+            .username(registrationRequest.username())
+            .password(registrationRequest.password())
+            .roles(roles)
+            .build();
 
         try {
             var savedUser = repository.save(userToSave);
@@ -74,17 +72,24 @@ public class UserService {
             throw new IllegalStateException("User is ADMIN already");
         }
 
-        userToPromote.setRoles(new HashSet<>(Set.of(UserRole.ADMIN)));
+        Set<UserRole> roles = new HashSet<UserRole>(userToPromote.getRoles());
+        roles.add(UserRole.ADMIN);
+        userToPromote.setRoles(roles);
 
         var savedUser = repository.save(userToPromote);
 
         return mapper.toResponse(savedUser);
     }
 
+    @Transactional
     public void verifyEmail(Long userId, String email) {
 
         var userEntity = getUserEntityById(userId);
         userEntity.setEmail(email);
         repository.save(userEntity);
+    }
+
+    public boolean existsByEmail(String email) {
+        return repository.existsByEmail(email);
     }
 }

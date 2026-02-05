@@ -10,8 +10,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Long> {
 
     Optional<UserEntity> findByUsername(String username);
 
-    @Query("""
-            SELECT 1 FROM UserEntity u
-            """)
-    Optional<Integer> findAny();
+    boolean existsBy();
+
+    boolean existsByEmail(String email);
 }
