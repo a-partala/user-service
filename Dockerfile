@@ -10,6 +10,6 @@ RUN mvn package -DskipTests
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 
-COPY --from=build /app/target/*[!plain].jar app.jar
+COPY --from=build /app/target/*-SNAPSHOT.jar app.jar
 
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
