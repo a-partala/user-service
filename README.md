@@ -1,15 +1,17 @@
-
 # User Service
 REST microservice for user management and authentication
 
+> **Note:** This service is designed to run within the [Orchestra ecosystem](https://github.com/a-partala/orchestra).<br><br>
+> Please follow the **[Quick Start Guide](https://github.com/a-partala/orchestra#quick-start)** to spin up the system.
+
 ## Technologies
-Java 21, Spring Boot (Web, Security, Data JPA), PostgreSQL, Docker, JUnit, Mockito, Maven, Lombok
+Java 21, Spring Boot (Web, Security, Data JPA), Flyway, PostgreSQL, Docker, JUnit, Mockito, Maven, Lombok
 
 ## Functionality
 - User registration
 - JWT authentication
 - Role-based authorization
-- Email verification (temporary stub, no email sending)
+- Atomic email verification
 
 ## Package structure
 ```
@@ -33,14 +35,6 @@ POST /email/request-verification - temporary, generate verification token
 POST /email/verify?token=TOKEN - verify email with token
 GET /users/{id}                     - get user by id
 POST /users/{id}/promote            - promote user to ADMIN
-```
-
-## Run locally
-Prerequisite:
-- PostgreSQL running locally
-```
-mvn clean install
-mvn spring-boot:run
 ```
 
 ## Request Examples
