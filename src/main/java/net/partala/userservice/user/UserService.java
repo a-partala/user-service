@@ -5,6 +5,7 @@ import net.partala.userservice.dto.response.UserResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
@@ -15,13 +16,15 @@ import java.util.Set;
 public class UserService {
 
     private final Logger log = LoggerFactory.getLogger(UserService.class);
+    private final PasswordEncoder passwordEncoder;
     private final UserRepository repository;
     private final UserMapper mapper;
 
     public UserService(
-            UserRepository repository,
+            PasswordEncoder passwordEncoder, UserRepository repository,
             UserMapper mapper
     ) {
+        this.passwordEncoder = passwordEncoder;
         this.repository = repository;
         this.mapper = mapper;
     }
@@ -34,7 +37,7 @@ public class UserService {
 
         return repository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException(
-                        "Cannot find user with id = " + id
+                        "Cannot find a user with id = " + id
                 ));
     }
 
@@ -49,9 +52,10 @@ public class UserService {
             roles.add(UserRole.ADMIN);
         }
 
+        var encodedPassword = passwordEncoder.encode(registrationRequest.password());
         var userToSave = UserEntity.builder()
             .username(registrationRequest.username())
-            .password(registrationRequest.password())
+            .password(encodedPassword)
             .roles(roles)
             .build();
 
@@ -59,7 +63,7 @@ public class UserService {
             var savedUser = repository.save(userToSave);
             log.info("User created successfully, id={}", savedUser.getId());
         } catch (DataIntegrityViolationException e) {
-            throw new IllegalStateException("This user already exists");
+            throw new IllegalStateException("This username is already taken");
         }
     }
 
@@ -69,10 +73,10 @@ public class UserService {
         var userToPromote = getUserEntityById(id);
 
         if(userToPromote.getRoles().contains(UserRole.ADMIN)) {
-            throw new IllegalStateException("User is ADMIN already");
+            throw new IllegalStateException("The user is ADMIN already");
         }
 
-        Set<UserRole> roles = new HashSet<UserRole>(userToPromote.getRoles());
+        Set<UserRole> roles = new HashSet<>(userToPromote.getRoles());
         roles.add(UserRole.ADMIN);
         userToPromote.setRoles(roles);
 
